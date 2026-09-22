@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07111f">
+<meta name="color-scheme" content="dark">
+<meta name="description" content="SpeedWave — tes kecepatan internet download, upload, ping, Mbps dan MBps.">
+<title>SpeedWave — Internet Speed Test</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+<style>
+:root{
+  --bg:#07111f;
+  --bg2:#0b1728;
+  --panel:rgba(15,28,48,.82);
+  --panel-soft:rgba(16,31,53,.66);
+  --line:rgba(148,163,184,.15);
+  --text:#e8f1fb;
+  --muted:#8fa4ba;
+  --cyan:#22d3ee;
+  --cyan2:#67e8f9;
+  --blue:#60a5fa;
+  --green:#34d399;
+  --amber:#fbbf24;
+  --red:#fb7185;
+  --header-h:68px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{
+  margin:0;
+  min-height:100svh;
+  background:
+    radial-gradient(circle at 15% -5%,rgba(34,211,238,.13),transparent 34%),
+    radial-gradient(circle at 90% 5%,rgba(96,165,250,.10),transparent 28%),
+    linear-gradient(180deg,#07111f 0%,#081423 48%,#06101d 100%);
+  color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button,input{font:inherit}
+button{touch-action:manipulation}
+::selection{background:rgba(34,211,238,.25)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(148,163,184,.2);border-radius:999px}
+.app-shell{min-height:100svh}
+.container-wide{width:min(1120px,calc(100% - 28px));margin-inline:auto}
+.topbar{
+  min-height:var(--header-h);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+.brand{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  color:var(--text);
+  text-decoration:none;
+  font-weight:800;
+  letter-spacing:-.02em;
+}
+.brand-mark{
+  width:36px;height:36px;border-radius:12px;
+  display:grid;place-items:center;
+  color:#03232a;
+  background:linear-gradient(135deg,var(--cyan2),var(--cyan));
+  box-shadow:0 8px 24px rgba(34,211,238,.18);
+}
+.status-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  min-height:34px;
+  padding:0 11px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:rgba(10,22,38,.72);
+  color:#b9c9d8;
+  font-size:12px;
+  white-space:nowrap;
+}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 4px rgba(52,211,153,.10)}
+.hero{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:18px;
+  padding:12px 0 28px;
+}
+.hero-copy{padding:8px 2px 0}
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#83a0ba;
+}
+.eyebrow-line{width:26px;height:1px;background:linear-gradient(90deg,var(--cyan),transparent)}
+.hero h1{
+  margin:12px 0 10px;
+  font-size:clamp(34px,9vw,74px);
+  line-height:.98;
+  letter-spacing:-.055em;
+  font-weight:850;
+  max-width:820px;
+}
+.hero h1 span{
+  background:linear-gradient(90deg,#f3fbff 5%,#9deaf6 48%,#93c5fd 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.hero p{
+  margin:0;
+  max-width:640px;
+  color:var(--muted);
+  line-height:1.65;
+  font-size:14px;
+}
+.tool-card{
+  position:relative;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:24px;
+  background:linear-gradient(180deg,rgba(15,29,50,.88),rgba(9,19,34,.88));
+  box-shadow:0 18px 48px rgba(0,0,0,.18);
+}
+.tool-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(135deg,rgba(34,211,238,.06),transparent 45%,rgba(96,165,250,.04));
+}
+.gauge-wrap{
+  display:grid;
+  place-items:center;
+  padding:18px 18px 8px;
+}
+.gauge{
+  width:min(78vw,330px);
+  aspect-ratio:1;
+  position:relative;
+}
+.gauge svg{
+  width:100%;height:100%;
+  transform:rotate(-90deg);
+  overflow:visible;
+}
+.gauge-track{fill:none;stroke:rgba(148,163,184,.10);stroke-width:12}
+.gauge-value{
+  fill:none;
+  stroke:url(#speedGradient);
+  stroke-width:12;
+  stroke-linecap:round;
+  transition:stroke-dashoffset .16s linear;
+  filter:drop-shadow(0 0 10px rgba(34,211,238,.20));
+}
+.gauge-center{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  text-align:center;
+  padding:40px;
+}
+.speed-number{
+  font-size:clamp(40px,13vw,68px);
+  line-height:.95;
+  letter-spacing:-.06em;
+  font-weight:850;
+  font-variant-numeric:tabular-nums;
+}
+.speed-unit{
+  margin-top:8px;
+  color:#9eb4c9;
+  font-size:13px;
+  font-weight:700;
+}
+.speed-sub{
+  margin-top:5px;
+  color:#6f8498;
+  font-size:11px;
+  font-variant-numeric:tabular-nums;
+}
+.phase{
+  margin-top:12px;
+  min-height:22px;
+  color:#95dceb;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+.controls{
+  display:flex;
+  gap:10px;
+  padding:12px 18px 18px;
+  flex-direction:column;
+}
+.primary-btn{
+  width:100%;
+  min-height:50px;
+  border:0;
+  border-radius:15px;
+  color:#05252b;
+  background:linear-gradient(135deg,#8ff3ff,#22d3ee 56%,#60a5fa);
+  font-weight:850;
+  box-shadow:0 10px 25px rgba(34,211,238,.12);
+  transition:transform .18s ease,filter .18s ease,opacity .18s ease;
+}
+.primary-btn:active{transform:scale(.985)}
+.primary-btn:disabled{cursor:not-allowed;opacity:.55;box-shadow:none}
+.ghost-btn{
+  min-height:50px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  color:#bdd0e2;
+  background:rgba(13,26,44,.68);
+  font-weight:750;
+  transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.ghost-btn:active{transform:scale(.985)}
+.unit-switch{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4px;
+  padding:4px;
+  border:1px solid var(--line);
+  border-radius:13px;
+  background:rgba(7,15,27,.72);
+}
+.unit-btn{
+  min-height:38px;
+  border:0;
+  border-radius:9px;
+  color:#7e94aa;
+  background:transparent;
+  font-size:12px;
+  font-weight:800;
+}
+.unit-btn.active{
+  color:#dffcff;
+  background:rgba(34,211,238,.10);
+  box-shadow:inset 0 0 0 1px rgba(34,211,238,.14);
+}
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  padding:0 18px 18px;
+}
+.metric{
+  min-height:92px;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(8,19,33,.58);
+}
+.metric-label{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  color:#7890a5;
+  font-size:11px;
+  font-weight:700;
+}
+.metric-icon{
+  width:25px;height:25px;border-radius:8px;
+  display:grid;place-items:center;
+  background:rgba(34,211,238,.08);
+  color:var(--cyan2);
+  flex:0 0 auto;
+}
+.metric-value{
+  margin-top:9px;
+  font-size:18px;
+  font-weight:850;
+  letter-spacing:-.025em;
+  font-variant-numeric:tabular-nums;
+}
+.metric-note{
+  margin-top:2px;
+  color:#678097;
+  font-size:10px;
+}
+.info-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:12px;
+  margin-top:12px;
+  padding-bottom:30px;
+}
+.info-card{
+  border:1px solid var(--line);
+  border-radius:20px;
+  background:rgba(9,19,33,.72);
+  padding:17px;
+}
+.info-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.info-title{font-size:13px;font-weight:800;color:#cbd9e6}
+.info-kicker{font-size:10px;color:#6f8498}
+.connection{
+  display:flex;align-items:center;gap:10px;
+  color:#9eb2c6;font-size:12px;min-width:0;
+}
+.connection strong{color:#e1edf7;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+.meta{
+  border-radius:13px;
+  border:1px solid rgba(148,163,184,.09);
+  background:rgba(4,11,20,.34);
+  padding:10px;
+  min-width:0;
+}
+.meta span{display:block;color:#627a90;font-size:9px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.meta strong{display:block;margin-top:4px;color:#bbcedf;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.steps{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+.step{
+  display:flex;
+  align-items:flex-start;
+  gap:11px;
+}
+.step-num{
+  width:27px;height:27px;border-radius:9px;display:grid;place-items:center;
+  flex:0 0 auto;
+  color:#b8f4fb;
+  background:rgba(34,211,238,.08);
+  border:1px solid rgba(34,211,238,.11);
+  font-size:10px;font-weight:850;
+}
+.step-copy strong{display:block;color:#c9d7e4;font-size:11px}
+.step-copy span{display:block;margin-top:2px;color:#71879a;font-size:10px;line-height:1.5}
+.note{
+  margin-top:12px;
+  padding:12px 13px;
+  border-radius:14px;
+  border:1px solid rgba(34,211,238,.10);
+  background:rgba(34,211,238,.04);
+  color:#7690a5;
+  font-size:10px;
+  line-height:1.6;
+}
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:12px;
+}
+.action-btn{
+  min-height:42px;
+  border-radius:12px;
+  border:1px solid var(--line);
+  background:rgba(10,22,38,.62);
+  color:#a9bfd2;
+  font-size:11px;
+  font-weight:800;
+}
+.footer{
+  padding:4px 0 24px;
+  color:#5e7388;
+  font-size:10px;
+  text-align:center;
+}
+.toast{
+  position:fixed;
+  left:50%;
+  bottom:calc(16px + env(safe-area-inset-bottom));
+  transform:translate(-50%,16px);
+  padding:10px 13px;
+  border:1px solid rgba(148,163,184,.14);
+  border-radius:12px;
+  background:#0c1a2c;
+  color:#cfe0ee;
+  font-size:11px;
+  font-weight:700;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease,transform .18s ease;
+  z-index:40;
+  white-space:nowrap;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.loading-bar{
+  position:absolute;
+  left:0;right:0;bottom:0;
+  height:2px;
+  overflow:hidden;
+  opacity:0;
+  background:rgba(34,211,238,.08);
+}
+.loading-bar::after{
+  content:"";
+  display:block;
+  height:100%;
+  width:35%;
+  transform:translateX(-130%);
+  background:linear-gradient(90deg,transparent,var(--cyan),transparent);
+}
+.tool-card.running .loading-bar{opacity:1}
+.tool-card.running .loading-bar::after{animation:scan 1.2s ease-in-out infinite}
+@keyframes scan{to{transform:translateX(380%)}}
+@media (min-width:700px){
+  .container-wide{width:min(1120px,calc(100% - 48px))}
+  .hero{grid-template-columns:minmax(0,1.03fr) minmax(380px,.97fr);align-items:center;gap:32px;padding:26px 0 38px}
+  .hero-copy{padding-top:0}
+  .hero h1{font-size:clamp(48px,6vw,72px)}
+  .controls{display:grid;grid-template-columns:1fr auto;align-items:center;flex-direction:row}
+  .primary-btn{width:auto;min-width:190px}
+  .unit-switch{min-width:172px}
+  .info-grid{grid-template-columns:1.2fr .8fr;gap:14px}
+  .metric{min-height:98px}
+}
+@media (min-width:1024px){
+  :root{--header-h:74px}
+  .tool-card{box-shadow:0 24px 70px rgba(0,0,0,.22)}
+}
+@media (hover:hover) and (pointer:fine){
+  .primary-btn:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-1px)}
+  .ghost-btn:hover,.action-btn:hover{background:rgba(19,36,59,.8);border-color:rgba(148,163,184,.24)}
+  .unit-btn:hover{color:#b9d9e9}
+}
+@media (min-width:900px){
+  .tool-card{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .info-card{backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px)}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <header>
+    <div class="container-wide topbar">
+      <a class="brand" href="#" aria-label="SpeedWave">
+        <span class="brand-mark">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 9.5a12 12 0 0 1 16 0M7 13a7.6 7.6 0 0 1 10 0M10 16.5a3.2 3.2 0 0 1 4 0M12 20h.01" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>SpeedWave</span>
+      </a>
+      <div class="status-pill" id="networkStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="statusText">Siap menguji</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container-wide">
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-line"></span> Internet speed test</div>
+        <h1>Ukur koneksi Anda <span>secara langsung.</span></h1>
+        <p>Uji download, upload, dan latency dari browser menggunakan koneksi HTTPS ke jaringan Cloudflare. Hasil utama bisa ditampilkan dalam Mbps maupun MBps.</p>
+      </div>
+
+      <section class="tool-card" id="testCard" aria-label="Internet speed test">
+        <div class="gauge-wrap">
+          <div class="gauge">
+            <svg viewBox="0 0 220 220" aria-hidden="true">
+              <defs>
+                <linearGradient id="speedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#67e8f9"/>
+                  <stop offset="58%" stop-color="#22d3ee"/>
+                  <stop offset="100%" stop-color="#60a5fa"/>
+                </linearGradient>
+              </defs>
+              <circle class="gauge-track" cx="110" cy="110" r="88"></circle>
+              <circle class="gauge-value" id="gaugeValue" cx="110" cy="110" r="88"></circle>
+            </svg>
+            <div class="gauge-center">
+              <div class="speed-number" id="speedValue">0.0</div>
+              <div class="speed-unit" id="speedUnit">Mbps</div>
+              <div class="speed-sub" id="secondaryValue">0.00 MBps</div>
+              <div class="phase" id="phaseText">Tekan Mulai Tes</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button class="primary-btn" id="startBtn" type="button">Mulai Tes</button>
+          <div class="unit-switch" role="group" aria-label="Satuan kecepatan">
+            <button class="unit-btn active" id="mbpsBtn" type="button" data-unit="mbps">Mbps</button>
+            <button class="unit-btn" id="mbpsBytesBtn" type="button" data-unit="MBps">MBps</button>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">
+              <span class="metric-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 19V5m0 0 5 5m-5-5-5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Download
+            </div>
+            <div class="metric-value" id="downloadMetric">—</div>
+            <div class="metric-note">Kecepatan unduh</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">
+              <span class="metric-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m0 0 5-5m-5 5-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Upload
+            </div>
+            <div class="metric-value" id="uploadMetric">—</div>
+            <div class="metric-note">Kecepatan unggah</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">
+              <span class="metric-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 6v6l4 2m5-2a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </span>
+              Ping
+            </div>
+            <div class="metric-value" id="pingMetric">—</div>
+            <div class="metric-note">Latency HTTP</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">
+              <span class="metric-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 5h14v14H5zM8 9h8M8 13h5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Konsistensi
+            </div>
+            <div class="metric-value" id="qualityMetric">Siap</div>
+            <div class="metric-note" id="qualityNote">Belum ada hasil</div>
+          </div>
+        </div>
+        <div class="loading-bar" aria-hidden="true"></div>
+      </section>
+    </section>
+
+    <section class="info-grid">
+      <div class="info-card">
+        <div class="info-head">
+          <div>
+            <div class="info-title">Koneksi terdeteksi</div>
+            <div class="info-kicker">Informasi dari endpoint pengukuran</div>
+          </div>
+          <div class="connection">
+            <span class="status-dot" id="metaDot"></span>
+            <strong id="metaState">Menunggu</strong>
+          </div>
+        </div>
+        <div class="meta-grid">
+          <div class="meta"><span>IP</span><strong id="ipMeta">—</strong></div>
+          <div class="meta"><span>ISP</span><strong id="ispMeta">—</strong></div>
+          <div class="meta"><span>Region</span><strong id="regionMeta">—</strong></div>
+          <div class="meta"><span>Edge</span><strong id="coloMeta">—</strong></div>
+        </div>
+        <div class="actions">
+          <button class="action-btn" id="copyBtn" type="button">Salin Hasil</button>
+          <button class="action-btn" id="shareBtn" type="button">Bagikan</button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="info-title">Cara kerja</div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">01</div>
+            <div class="step-copy"><strong>Latency</strong><span>Beberapa request kecil untuk melihat waktu respons jaringan.</span></div>
+          </div>
+          <div class="step">
+            <div class="step-num">02</div>
+            <div class="step-copy"><strong>Download</strong><span>Browser menerima data berukuran dinamis dan menghitung throughput aktual.</span></div>
+          </div>
+          <div class="step">
+            <div class="step-num">03</div>
+            <div class="step-copy"><strong>Upload</strong><span>Browser mengirim payload biner dan menghitung throughput upload.</span></div>
+          </div>
+        </div>
+        <div class="note">1 byte = 8 bit. Jadi 100 Mbps ≈ 12.5 MBps. Nilai MBps di halaman ini adalah konversi dari hasil Mbps yang sama.</div>
+      </div>
+    </section>
+
+    <footer class="footer">SpeedWave • Pengukuran berbasis web dapat dipengaruhi Wi‑Fi, VPN, perangkat, browser, dan beban jaringan saat tes.</footer>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  const DOWN_URL = 'https://speed.cloudflare.com/__down';
+  const UP_URL = 'https://speed.cloudflare.com/__up';
+  const META_URL = 'https://speed.cloudflare.com/meta';
+  
+  const els = {
+    body: document.body,
+    card: document.getElementById('testCard'),
+    start: document.getElementById('startBtn'),
+    mbpsBtn: document.getElementById('mbpsBtn'),
+    MBpsBtn: document.getElementById('mbpsBytesBtn'),
+    speed: document.getElementById('speedValue'),
+    unit: document.getElementById('speedUnit'),
+    secondary: document.getElementById('secondaryValue'),
+    phase: document.getElementById('phaseText'),
+    download: document.getElementById('downloadMetric'),
+    upload: document.getElementById('uploadMetric'),
+    ping: document.getElementById('pingMetric'),
+    quality: document.getElementById('qualityMetric'),
+    qualityNote: document.getElementById('qualityNote'),
+    statusText: document.getElementById('statusText'),
+    statusDot: document.getElementById('statusDot'),
+    metaState: document.getElementById('metaState'),
+    metaDot: document.getElementById('metaDot'),
+    ip: document.getElementById('ipMeta'),
+    isp: document.getElementById('ispMeta'),
+    region: document.getElementById('regionMeta'),
+    colo: document.getElementById('coloMeta'),
+    copy: document.getElementById('copyBtn'),
+    share: document.getElementById('shareBtn'),
+    toast: document.getElementById('toast'),
+    gauge: document.getElementById('gaugeValue')
+  };
+
+  const circumference = 2 * Math.PI * 88;
+  els.gauge.style.strokeDasharray = circumference.toFixed(2);
+  els.gauge.style.strokeDashoffset = circumference.toFixed(2);
+
+  const state = {
+    running: false,
+    phase: 'idle',
+    displayUnit: 'mbps',
+    liveMbps: 0,
+    downloadMbps: null,
+    uploadMbps: null,
+    pingMs: null,
+    startedAt: 0,
+    rafId: 0,
+    abort: null,
+    resultReady: false
+  };
+
+  let toastTimer = 0;
+
+  function showToast(message) {
+    clearTimeout(toastTimer);
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2200);
+  }
+
+  function formatSpeed(mbps, unit = state.displayUnit) {
+    if (!Number.isFinite(mbps)) return '—';
+    const value = unit === 'MBps' ? mbps / 8 : mbps;
+    return `${value < 100 ? value.toFixed(1) : Math.round(value)}`;
+  }
+
+  function formatFull(mbps) {
+    if (!Number.isFinite(mbps)) return '—';
+    return `${mbps.toFixed(1)} Mbps / ${(mbps / 8).toFixed(2)} MBps`;
+  }
+
+  function setGauge(mbps) {
+    const normalized = Math.max(0, Math.min(1, Math.log10(Math.max(mbps, 1)) / 3));
+    const offset = circumference * (1 - normalized);
+    els.gauge.style.strokeDashoffset = offset.toFixed(2);
+  }
+
+  function updateView() {
+    const display = formatSpeed(state.liveMbps, state.displayUnit);
+    els.speed.textContent = display;
+    els.unit.textContent = state.displayUnit;
+    els.secondary.textContent = Number.isFinite(state.liveMbps)
+      ? `${formatSpeed(state.liveMbps, state.displayUnit === 'MBps' ? 'mbps' : 'MBps')} ${state.displayUnit === 'MBps' ? 'Mbps' : 'MBps'}`
+      : '0.00 MBps';
+    if (Number.isFinite(state.liveMbps)) {
+      const mbps = state.displayUnit === 'mbps' ? state.liveMbps : state.liveMbps;
+      const secondaryUnit = state.displayUnit === 'mbps' ? 'MBps' : 'Mbps';
+      const secondaryValue = secondaryUnit === 'MBps' ? mbps / 8 : mbps;
+      els.secondary.textContent = `${secondaryValue < 100 ? secondaryValue.toFixed(2) : Math.round(secondaryValue)} ${secondaryUnit}`;
+    }
+    if (Number.isFinite(state.downloadMbps)) {
+      els.download.textContent = formatFull(state.downloadMbps);
+    }
+    if (Number.isFinite(state.uploadMbps)) {
+      els.upload.textContent = formatFull(state.uploadMbps);
+    }
+    if (Number.isFinite(state.pingMs)) {
+      els.ping.textContent = `${Math.round(state.pingMs)} ms`;
+    }
+    setGauge(Math.max(state.liveMbps || 0, 0));
+  }
+
+  function startRenderLoop() {
+    cancelAnimationFrame(state.rafId);
+    const tick = () => {
+      if (!state.running) return;
+      updateView();
+      state.rafId = requestAnimationFrame(tick);
+    };
+    state.rafId = requestAnimationFrame(tick);
+  }
+
+  function stopRenderLoop() {
+    cancelAnimationFrame(state.rafId);
+    state.rafId = 0;
+  }
+
+  function setStatus(text, active = false, error = false) {
+    els.statusText.textContent = text;
+    els.statusDot.style.background = error ? 'var(--red)' : active ? 'var(--cyan)' : 'var(--green)';
+    els.statusDot.style.boxShadow = error
+      ? '0 0 0 4px rgba(251,113,133,.10)'
+      : active
+        ? '0 0 0 4px rgba(34,211,238,.10)'
+        : '0 0 0 4px rgba(52,211,153,.10)';
+  }
+
+  function setPhase(text) {
+    els.phase.textContent = text;
+  }
+
+  function resetResults() {
+    state.liveMbps = 0;
+    state.downloadMbps = null;
+    state.uploadMbps = null;
+    state.pingMs = null;
+    state.resultReady = false;
+    els.download.textContent = '—';
+    els.upload.textContent = '—';
+    els.ping.textContent = '—';
+    els.quality.textContent = 'Siap';
+    els.qualityNote.textContent = 'Belum ada hasil';
+    els.speed.textContent = '0.0';
+    els.secondary.textContent = '0.00 MBps';
+    els.gauge.style.strokeDashoffset = circumference.toFixed(2);
+  }
+
+  async function timedFetch(url, options = {}) {
+    const started = performance.now();
+    const response = await fetch(url, {
+      cache: 'no-store',
+      credentials: 'omit',
+      ...options
+    });
+    return { response, elapsed: performance.now() - started };
+  }
+
+  async function measurePing(signal) {
+    const samples = [];
+    for (let i = 0; i < 5; i++) {
+      const started = performance.now();
+      const response = await fetch(`${DOWN_URL}?bytes=0&ping=${Date.now()}_${i}`, {
+        cache: 'no-store',
+        credentials: 'omit',
+        signal
+      });
+      if (!response.ok) throw new Error('Ping gagal');
+      await response.arrayBuffer();
+      samples.push(performance.now() - started);
+    }
+    samples.sort((a,b) => a-b);
+    samples.shift();
+    samples.pop();
+    return samples.reduce((a,b) => a+b, 0) / Math.max(samples.length, 1);
+  }
+
+  async function measureDownload(signal) {
+    const size = window.innerWidth < 500 ? 5000000 : 12000000;
+    const url = `${DOWN_URL}?bytes=${size}&measId=${Date.now()}`;
+    const started = performance.now();
+    const response = await fetch(url, {
+      cache: 'no-store',
+      credentials: 'omit',
+      signal
+    });
+    if (!response.ok) throw new Error('Download gagal');
+
+    let bytes = 0;
+    if (response.body && response.body.getReader) {
+      const reader = response.body.getReader();
+      while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        bytes += chunk.value.byteLength;
+      }
+    } else {
+      const buffer = await response.arrayBuffer();
+      bytes = buffer.byteLength;
+    }
+
+    const elapsed = (performance.now() - started) / 1000;
+    return bytes > 0 ? (bytes * 8) / elapsed / 1000000 : 0;
+  }
+
+  async function measureUpload(signal) {
+    const size = window.innerWidth < 500 ? 2500000 : 6000000;
+    const body = new Uint8Array(size);
+    const started = performance.now();
+    const response = await fetch(`${UP_URL}?measId=${Date.now()}`, {
+      method: 'POST',
+      cache: 'no-store',
+      credentials: 'omit',
+      body,
+      signal
+    });
+    if (!response.ok) throw new Error(`Upload gagal (${response.status})`);
+    await response.arrayBuffer().catch(() => null);
+    const elapsed = (performance.now() - started) / 1000;
+    return (size * 8) / Math.max(elapsed, 0.001) / 1000000;
+  }
+
+  async function loadMeta() {
+    try {
+      const response = await fetch(`${META_URL}?t=${Date.now()}`, {
+        cache:'no-store',
+        credentials:'omit'
+      });
+      if (!response.ok) throw new Error();
+      const data = await response.json();
+      els.ip.textContent = data.clientIp || '—';
+      els.isp.textContent = data.asOrganization || '—';
+      els.region.textContent = data.region || '—';
+      els.colo.textContent = data.colo || '—';
+      els.metaState.textContent = data.colo ? 'Terdeteksi' : 'Online';
+      els.metaDot.style.background = 'var(--green)';
+    } catch {
+      els.metaState.textContent = 'Tidak tersedia';
+      els.metaDot.style.background = 'var(--amber)';
+    }
+  }
+
+  function assessQuality() {
+    const d = state.downloadMbps || 0;
+    const u = state.uploadMbps || 0;
+    const p = state.pingMs || 999;
+    const score = Math.min(100, (Math.min(d / 100, 1) * 45) + (Math.min(u / 50, 1) * 25) + (Math.max(0, 1 - p / 120) * 30));
+    if (score >= 82) {
+      els.quality.textContent = 'Sangat baik';
+      els.qualityNote.textContent = `Skor indikatif ${Math.round(score)}/100`;
+    } else if (score >= 62) {
+      els.quality.textContent = 'Baik';
+      els.qualityNote.textContent = `Skor indikatif ${Math.round(score)}/100`;
+    } else if (score >= 42) {
+      els.quality.textContent = 'Cukup';
+      els.qualityNote.textContent = `Skor indikatif ${Math.round(score)}/100`;
+    } else {
+      els.quality.textContent = 'Lambat';
+      els.qualityNote.textContent = `Skor indikatif ${Math.round(score)}/100`;
+    }
+  }
+
+  function updateDisplayUnit(unit) {
+    state.displayUnit = unit;
+    els.mbpsBtn.classList.toggle('active', unit === 'mbps');
+    els.MBpsBtn.classList.toggle('active', unit === 'MBps');
+    updateView();
+  }
+
+  function currentResultText() {
+    if (!state.resultReady) return 'Belum ada hasil tes.';
+    return [
+      'SpeedWave — Hasil Internet Speed Test',
+      `Download: ${formatFull(state.downloadMbps)}`,
+      `Upload: ${formatFull(state.uploadMbps)}`,
+      `Ping: ${Math.round(state.pingMs || 0)} ms`,
+      `Kualitas: ${els.quality.textContent}`,
+      `Waktu: ${new Date().toLocaleString('id-ID')}`
+    ].join('\n');
+  }
+
+  async function copyResult() {
+    const text = currentResultText();
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Hasil berhasil disalin');
+    } catch {
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.style.position = 'fixed';
+      area.style.opacity = '0';
+      document.body.appendChild(area);
+      area.select();
+      document.execCommand('copy');
+      area.remove();
+      showToast('Hasil berhasil disalin');
+    }
+  }
+
+  async function shareResult() {
+    const text = currentResultText();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title:'SpeedWave — Hasil Tes', text });
+        return;
+      } catch {}
+    }
+    await copyResult();
+  }
+
+  async function runTest() {
+    if (state.running) return;
+    state.running = true;
+    state.startedAt = performance.now();
+    state.abort = new AbortController();
+    state.phase = 'running';
+    resetResults();
+    els.start.textContent = 'Batalkan Tes';
+    els.card.classList.add('running');
+    setStatus('Sedang menguji', true);
+    startRenderLoop();
+
+    try {
+      setPhase('Mengukur latency…');
+      state.pingMs = await measurePing(state.abort.signal);
+
+      setPhase('Mengukur download…');
+      state.downloadMbps = await measureDownload(state.abort.signal);
+      state.liveMbps = state.downloadMbps;
+
+      setPhase('Mengukur upload…');
+      state.uploadMbps = await measureUpload(state.abort.signal);
+      state.liveMbps = state.uploadMbps;
+
+      setPhase('Menyiapkan hasil…');
+      assessQuality();
+      state.liveMbps = Math.max(state.downloadMbps || 0, state.uploadMbps || 0);
+      state.resultReady = true;
+      setPhase('Tes selesai');
+      setStatus('Tes selesai');
+      showToast('Pengukuran selesai');
+      updateView();
+    } catch (error) {
+      if (state.abort && state.abort.signal.aborted) {
+        setPhase('Tes dibatalkan');
+        setStatus('Dibatalkan');
+        showToast('Tes dibatalkan');
+      } else {
+        const detail = error && error.message ? error.message : 'Endpoint tidak merespons';
+        setPhase('Gagal mengukur');
+        setStatus('Koneksi gagal', false, true);
+        els.quality.textContent = 'Error';
+        els.qualityNote.textContent = detail;
+        if (location.protocol === 'file:') {
+          showToast('Buka melalui hosting atau localhost');
+        } else {
+          showToast('Tes gagal. Coba lagi.');
+        }
+      }
+    } finally {
+      state.running = false;
+      stopRenderLoop();
+      els.start.textContent = state.resultReady ? 'Tes Lagi' : 'Mulai Tes';
+      els.card.classList.remove('running');
+      updateView();
+    }
+  }
+
+  function cancelTest() {
+    if (!state.running) return;
+    state.abort?.abort();
+  }
+
+  els.start.addEventListener('click', () => {
+    if (state.running) cancelTest();
+    else runTest();
+  }, {passive:true});
+
+  els.mbpsBtn.addEventListener('click', () => updateDisplayUnit('mbps'), {passive:true});
+  els.MBpsBtn.addEventListener('click', () => updateDisplayUnit('MBps'), {passive:true});
+  els.copy.addEventListener('click', copyResult);
+  els.share.addEventListener('click', shareResult);
+
+  loadMeta();
+  updateView();
+
+  window.addEventListener('pagehide', () => {
+    if (state.running) state.abort?.abort();
+    stopRenderLoop();
+  }, {passive:true});
+})();
+</script>
+</body>
+</html>
