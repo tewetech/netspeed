@@ -622,7 +622,8 @@ button{touch-action:manipulation}
   const DOWN_URL = 'https://speed.cloudflare.com/__down';
   const UP_URL = 'https://speed.cloudflare.com/__up';
   const META_URL = 'https://speed.cloudflare.com/meta';
-  
+  const TRACE_URL = 'https://speed.cloudflare.com/cdn-cgi/trace';
+
   const els = {
     body: document.body,
     card: document.getElementById('testCard'),
@@ -778,15 +779,15 @@ button{touch-action:manipulation}
 
   async function measurePing(signal) {
     const samples = [];
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 4; i++) {
       const started = performance.now();
-      const response = await fetch(`${DOWN_URL}?bytes=0&ping=${Date.now()}_${i}`, {
+      const response = await fetch(`${TRACE_URL}?t=${Date.now()}_${i}`, {
         cache: 'no-store',
         credentials: 'omit',
         signal
       });
       if (!response.ok) throw new Error('Ping gagal');
-      await response.arrayBuffer();
+      await response.text();
       samples.push(performance.now() - started);
     }
     samples.sort((a,b) => a-b);
@@ -796,7 +797,7 @@ button{touch-action:manipulation}
   }
 
   async function measureDownload(signal) {
-    const size = window.innerWidth < 500 ? 5000000 : 12000000;
+    const size = window.innerWidth < 500 ? 6000000 : 14000000;
     const url = `${DOWN_URL}?bytes=${size}&measId=${Date.now()}`;
     const started = performance.now();
     const response = await fetch(url, {
@@ -824,17 +825,19 @@ button{touch-action:manipulation}
   }
 
   async function measureUpload(signal) {
-    const size = window.innerWidth < 500 ? 2500000 : 6000000;
-    const body = new Uint8Array(size);
+    const size = window.innerWidth < 500 ? 3000000 : 7000000;
+    const chunk = new Uint8Array(size);
+    const body = new Blob([chunk.buffer], { type: 'application/octet-stream' });
     const started = performance.now();
     const response = await fetch(`${UP_URL}?measId=${Date.now()}`, {
       method: 'POST',
+      headers: {'Content-Type':'application/octet-stream'},
       cache: 'no-store',
       credentials: 'omit',
       body,
       signal
     });
-    if (!response.ok) throw new Error(`Upload gagal (${response.status})`);
+    if (!response.ok) throw new Error('Upload gagal');
     await response.arrayBuffer().catch(() => null);
     const elapsed = (performance.now() - started) / 1000;
     return (size * 8) / Math.max(elapsed, 0.001) / 1000000;
@@ -855,7 +858,7 @@ button{touch-action:manipulation}
       els.metaState.textContent = data.colo ? 'Terdeteksi' : 'Online';
       els.metaDot.style.background = 'var(--green)';
     } catch {
-      els.metaState.textContent = 'Tidak tersedia';
+      els.metaState.textContent = 'Terbatas';
       els.metaDot.style.background = 'var(--amber)';
     }
   }
@@ -966,16 +969,11 @@ button{touch-action:manipulation}
         setStatus('Dibatalkan');
         showToast('Tes dibatalkan');
       } else {
-        const detail = error && error.message ? error.message : 'Endpoint tidak merespons';
         setPhase('Gagal mengukur');
         setStatus('Koneksi gagal', false, true);
         els.quality.textContent = 'Error';
-        els.qualityNote.textContent = detail;
-        if (location.protocol === 'file:') {
-          showToast('Buka melalui hosting atau localhost');
-        } else {
-          showToast('Tes gagal. Coba lagi.');
-        }
+        els.qualityNote.textContent = error && error.message ? error.message : 'Endpoint tidak merespons';
+        showToast('Tes gagal. Coba lagi.');
       }
     } finally {
       state.running = false;
