@@ -32,9 +32,11 @@ button{touch-action:manipulation}
 .gauge{position:relative;width:min(76vw,300px);aspect-ratio:1;margin:auto}
 .gauge-ring{position:absolute;inset:0;border-radius:50%;padding:10px;background:conic-gradient(from -90deg,var(--cyan) 0%,var(--cyan2) var(--progress,0%),rgba(148,163,184,.10) var(--progress,0%),rgba(148,163,184,.10) 100%);transition:background .16s linear}
 .gauge-ring::before{content:"";display:block;width:100%;height:100%;border-radius:50%;background:#081625}
-.gauge-core{position:absolute;inset:19px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,18,31,.96);border:1px solid rgba(148,163,184,.13);overflow:hidden}
+.gauge-core{position:absolute;inset:19px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(7,18,31,.96);border:1px solid rgba(148,163,184,.13);overflow:hidden;padding:10px}
 .speed-value{font-size:clamp(2.35rem,13vw,4.5rem);line-height:.95;font-weight:800;letter-spacing:-.06em;font-variant-numeric:tabular-nums}
 .speed-unit{font-size:.78rem;letter-spacing:.14em;color:#9bb0c7;font-weight:700;text-transform:uppercase;margin-top:.6rem}
+.speed-secondary{font-size:clamp(.9rem,3.8vw,1.15rem);line-height:1.1;font-weight:700;letter-spacing:-.02em;color:#67d7ff;font-variant-numeric:tabular-nums;margin-top:.8rem}
+.speed-secondary-unit{font-size:.58rem;letter-spacing:.13em;color:#6f879f;font-weight:700;text-transform:uppercase;margin-top:.25rem}
 .phase-pulse{animation:phasePulse 1.4s ease-in-out infinite}
 @keyframes phasePulse{50%{opacity:.48;transform:scale(.98)}}
 .progress-track{height:8px;border-radius:999px;background:rgba(148,163,184,.10);overflow:hidden}
@@ -71,7 +73,7 @@ button{touch-action:manipulation}
         </div>
         <div>
           <div class="text-sm font-bold tracking-wide text-white">NetSpeed Test</div>
-          <div class="text-[11px] text-slate-500">Mbps • MBps • Upload • Download</div>
+          <div class="text-[11px] text-slate-500">Mbps • MBps</div>
         </div>
       </div>
       <div class="flex items-center gap-2 rounded-full border border-slate-700/40 px-3 py-1.5 text-[11px] text-slate-400">
@@ -89,7 +91,7 @@ button{touch-action:manipulation}
           Internet Performance
         </div>
         <h1 class="mx-auto max-w-3xl text-3xl font-extrabold tracking-tight text-white sm:text-5xl">Ukur kecepatan internetmu secara real-time.</h1>
-        <p class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">Pantau download dan upload dengan hasil dalam Mbps sekaligus MBps, ditampilkan secara live selama proses tes.</p>
+        <p class="mx-auto mt-3 max-w-2xl text-sm leading-6 text-slate-400 sm:text-base">Pantau download dan upload dengan hasil dalam Mbps dan MBps yang ditampilkan secara live selama proses tes.</p>
       </section>
 
       <section class="glass rounded-[2rem] p-4 sm:p-7">
@@ -100,6 +102,8 @@ button{touch-action:manipulation}
               <div class="gauge-core">
                 <div id="speedValue" class="speed-value">0.00</div>
                 <div id="speedUnit" class="speed-unit">Mbps</div>
+                <div id="speedMBps" class="speed-secondary">0.00</div>
+                <div class="speed-secondary-unit">MBps</div>
                 <div id="liveMode" class="mt-3 text-xs font-medium text-slate-500">Belum dimulai</div>
               </div>
             </div>
@@ -121,7 +125,7 @@ button{touch-action:manipulation}
                   <div class="flex items-center gap-2 text-xs font-semibold text-slate-300"><span class="grid h-8 w-8 place-items-center rounded-xl bg-cyan-400/10 text-cyan-300"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/></svg></span>Download</div>
                   <span id="downloadState" class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Menunggu</span>
                 </div>
-                <div id="downloadMbps" class="metric-value mt-4 text-2xl font-extrabold text-white">—</div>
+                <div id="downloadMbps" class="metric-value mt-4 text-2xl font-extrabold text-white">— Mbps</div>
                 <div id="downloadMBps" class="metric-value mt-1 text-xs text-slate-500">— MBps</div>
               </div>
 
@@ -130,18 +134,18 @@ button{touch-action:manipulation}
                   <div class="flex items-center gap-2 text-xs font-semibold text-slate-300"><span class="grid h-8 w-8 place-items-center rounded-xl bg-emerald-400/10 text-emerald-300"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V8"/><path d="m7 13 5-5 5 5"/></svg></span>Upload</div>
                   <span id="uploadState" class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Menunggu</span>
                 </div>
-                <div id="uploadMbps" class="metric-value mt-4 text-2xl font-extrabold text-white">—</div>
+                <div id="uploadMbps" class="metric-value mt-4 text-2xl font-extrabold text-white">— Mbps</div>
                 <div id="uploadMBps" class="metric-value mt-1 text-xs text-slate-500">— MBps</div>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div class="rounded-2xl border border-slate-700/35 bg-slate-900/30 px-3 py-3.5">
-                <div class="text-[10px] uppercase tracking-[.15em] text-slate-500">Latency</div>
+                <div class="text-[10px] uppercase tracking-[.15em] text-slate-500">Connect</div>
                 <div id="latencyValue" class="metric-value mt-1.5 text-lg font-bold text-white">— ms</div>
               </div>
               <div class="rounded-2xl border border-slate-700/35 bg-slate-900/30 px-3 py-3.5">
-                <div class="text-[10px] uppercase tracking-[.15em] text-slate-500">Jaringan</div>
+                <div class="text-[10px] uppercase tracking-[.15em] text-slate-500">Server</div>
                 <div id="networkValue" class="mt-1.5 truncate text-lg font-bold text-white">Mencari...</div>
               </div>
               <div class="col-span-2 rounded-2xl border border-slate-700/35 bg-slate-900/30 px-3 py-3.5 sm:col-span-1">
@@ -150,13 +154,18 @@ button{touch-action:manipulation}
               </div>
             </div>
 
+            <label class="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-700/30 bg-slate-950/25 p-3.5 text-xs leading-5 text-slate-500">
+              <input id="consentCheck" type="checkbox" class="mt-0.5 h-4 w-4 shrink-0 accent-cyan-400">
+              <span>Saya menyetujui pengukuran menggunakan M-Lab dan telah membaca <a href="https://www.measurementlab.net/privacy-v3/" target="_blank" rel="noopener noreferrer" class="font-semibold text-cyan-300 underline decoration-cyan-300/30 underline-offset-2">kebijakan privasinya</a>.</span>
+            </label>
+
             <div class="flex flex-col gap-2.5 pt-1 sm:flex-row">
-              <button id="startButton" type="button" class="btn-primary min-h-12 flex-1 rounded-2xl px-5 text-sm font-extrabold tracking-wide">Mulai Tes</button>
+              <button id="startButton" type="button" class="btn-primary min-h-12 flex-1 rounded-2xl px-5 text-sm font-extrabold tracking-wide" disabled>Mulai Tes</button>
               <button id="resetButton" type="button" class="btn-secondary min-h-12 rounded-2xl px-5 text-sm font-bold text-slate-300">Reset</button>
             </div>
 
             <div class="rounded-2xl border border-slate-700/30 bg-slate-950/25 p-3.5 text-xs leading-5 text-slate-500">
-              Tes menggunakan koneksi ke layanan pengukuran internet. Untuk hasil yang lebih konsisten, tutup aktivitas download/upload lain selama tes berlangsung.
+              Server dipilih otomatis oleh M-Lab. Data uji yang dikumpulkan M-Lab mencakup metrik pengukuran dan alamat IP publik serta dapat dipublikasikan. Untuk hasil lebih konsisten, tutup aktivitas download/upload lain selama tes berlangsung.
             </div>
           </div>
         </div>
@@ -180,7 +189,7 @@ button{touch-action:manipulation}
         </div>
       </section>
 
-      <footer class="px-2 pb-2 pt-7 text-center text-[11px] text-slate-600">NetSpeed Test • Single-file HTML • Mobile-first</footer>
+      <footer class="px-2 pb-2 pt-7 text-center text-[11px] text-slate-600">NetSpeed Test • Mbps & MBps • Mobile-first</footer>
     </div>
   </main>
 </div>
@@ -189,15 +198,44 @@ button{touch-action:manipulation}
 (() => {
   const $ = (id) => document.getElementById(id);
   const els = {
-    start: $('startButton'), reset: $('resetButton'), gauge: $('gaugeRing'), value: $('speedValue'), unit: $('speedUnit'), liveMode: $('liveMode'), progress: $('progressFill'), progressLabel: $('progressLabel'), progressPercent: $('progressPercent'),
-    dot: $('statusDot'), status: $('statusText'), downloadCard: $('downloadCard'), uploadCard: $('uploadCard'), downloadState: $('downloadState'), uploadState: $('uploadState'), downloadMbps: $('downloadMbps'), downloadMBps: $('downloadMBps'), uploadMbps: $('uploadMbps'), uploadMBps: $('uploadMBps'), latency: $('latencyValue'), network: $('networkValue'), result: $('resultState')
+    start: $('startButton'),
+    reset: $('resetButton'),
+    consent: $('consentCheck'),
+    gauge: $('gaugeRing'),
+    value: $('speedValue'),
+    unit: $('speedUnit'),
+    speedMBps: $('speedMBps'),
+    liveMode: $('liveMode'),
+    progress: $('progressFill'),
+    progressLabel: $('progressLabel'),
+    progressPercent: $('progressPercent'),
+    dot: $('statusDot'),
+    status: $('statusText'),
+    downloadCard: $('downloadCard'),
+    uploadCard: $('uploadCard'),
+    downloadState: $('downloadState'),
+    uploadState: $('uploadState'),
+    downloadMbps: $('downloadMbps'),
+    downloadMBps: $('downloadMBps'),
+    uploadMbps: $('uploadMbps'),
+    uploadMBps: $('uploadMBps'),
+    latency: $('latencyValue'),
+    network: $('networkValue'),
+    result: $('resultState')
   };
 
-  const DOWN = 'https://speed.cloudflare.com/__down?bytes=';
-  const UP = 'https://speed.cloudflare.com/__up';
+  const LOCATE = 'https://locate.measurementlab.net/v2/nearest/ndt/ndt7';
+  const WS_PROTOCOL = 'net.measurementlab.ndt.v7';
+  const TEST_DURATION = 10000;
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const state = { running:false, phase:'idle', raf:0, aborter:null, startedAt:0, phaseStartedAt:0, downSamples:[], upSamples:[], download:0, upload:0 };
-  const sizes = [250000,500000,1000000,2000000,4000000,8000000];
+  const state = {
+    running:false,
+    aborter:null,
+    download:0,
+    upload:0,
+    downloadServer:null,
+    currentSocket:null
+  };
 
   function formatMbps(v){
     if (!Number.isFinite(v)) return '—';
@@ -205,185 +243,503 @@ button{touch-action:manipulation}
     if (v < 100) return v.toFixed(1);
     return v.toFixed(0);
   }
+
   function formatMBps(v){
     if (!Number.isFinite(v)) return '—';
     if (v < 10) return v.toFixed(2);
     if (v < 100) return v.toFixed(1);
     return v.toFixed(0);
   }
+
   function setStatus(text, type='idle'){
     els.status.textContent = text;
     els.dot.className = 'status-dot' + (type==='active'?' active':type==='ok'?' ok':type==='error'?' error':'');
   }
+
   function setGauge(speed, progress, mode){
     const p = Math.max(0, Math.min(100, progress));
+    const mbps = Number.isFinite(speed) ? speed : 0;
+    const mbpsDisplay = formatMbps(mbps);
+    const MBpsDisplay = formatMBps(mbps / 8);
+
     els.gauge.style.setProperty('--progress', p + '%');
-    els.value.textContent = formatMbps(speed);
+    els.value.textContent = mbpsDisplay;
     els.unit.textContent = 'Mbps';
+    els.speedMBps.textContent = MBpsDisplay;
     els.liveMode.textContent = mode;
     els.progress.style.width = p + '%';
     els.progressPercent.textContent = Math.round(p) + '%';
   }
-  function resetUI(){
-    cancelAnimationFrame(state.raf);
-    if(state.aborter) state.aborter.abort();
-    state.running=false; state.phase='idle'; state.download=0; state.upload=0; state.downSamples=[]; state.upSamples=[];
-    setStatus('Siap');
-    setGauge(0,0,'Belum dimulai');
-    els.progressLabel.textContent='Menunggu tes';
-    els.downloadState.textContent='Menunggu'; els.uploadState.textContent='Menunggu';
-    els.downloadMbps.textContent='—'; els.downloadMBps.textContent='— MBps';
-    els.uploadMbps.textContent='—'; els.uploadMBps.textContent='— MBps';
-    els.latency.textContent='— ms'; els.network.textContent='Mencari...'; els.result.textContent='Siap tes';
-    els.downloadCard.className=els.downloadCard.className.replace(/\s?(active|done)/g,'');
-    els.uploadCard.className=els.uploadCard.className.replace(/\s?(active|done)/g,'');
-    els.start.disabled=false; els.start.textContent='Mulai Tes';
-  }
-  function markPhase(el, mode){
+
+  function phaseClass(el, mode){
     el.classList.remove('active','done');
     if(mode) el.classList.add(mode);
   }
-  function sampleSpeed(bytes, elapsed){
-    if(elapsed <= 0) return 0;
-    return (bytes * 8 / elapsed) / 1000000;
-  }
-  async function latencyTest(signal){
-    const samples=[];
-    for(let i=0;i<4;i++){
-      const t=performance.now();
-      const r=await fetch('https://speed.cloudflare.com/__down?bytes=1&cachebust='+Date.now()+'-'+i,{method:'GET',cache:'no-store',signal,mode:'cors'});
-      if(!r.ok) throw new Error('Latency request failed');
-      await r.arrayBuffer();
-      samples.push(performance.now()-t);
+
+  function resetUI(){
+    if(state.currentSocket){
+      try{state.currentSocket.close();}catch{}
+      state.currentSocket=null;
     }
-    samples.sort((a,b)=>a-b);
-    const usable=samples.slice(0,3);
-    return usable.reduce((a,b)=>a+b,0)/usable.length;
-  }
-  async function runDownload(signal){
-    state.phase='download';
-    state.phaseStartedAt=performance.now();
-    markPhase(els.downloadCard,'active');
-    markPhase(els.uploadCard,'');
-    els.downloadState.textContent='Mengukur';
+
+    if(state.aborter) state.aborter.abort();
+
+    state.running=false;
+    state.download=0;
+    state.upload=0;
+    state.downloadServer=null;
+
+    setStatus('Siap');
+    setGauge(0,0,'Belum dimulai');
+
+    els.progressLabel.textContent='Menunggu tes';
+    els.downloadState.textContent='Menunggu';
     els.uploadState.textContent='Menunggu';
-    els.progressLabel.textContent='Mengukur download';
-    setStatus('Download aktif','active');
-    let totalBytes=0, started=performance.now(), lastLive=0;
-    for(let i=0;i<sizes.length;i++){
-      const expected=sizes[i];
-      const t=performance.now();
-      const res=await fetch(DOWN+expected+'&cachebust='+Date.now()+'-'+i,{method:'GET',cache:'no-store',signal,mode:'cors'});
-      if(!res.ok) throw new Error('Download request failed');
-      if(!res.body) throw new Error('Browser tidak mendukung streaming response');
-      const reader=res.body.getReader();
-      let chunkBytes=0;
-      while(true){
-        const {done,value}=await reader.read();
-        if(done) break;
-        const n=value.byteLength; chunkBytes+=n; totalBytes+=n;
-        const now=performance.now();
-        const live=sampleSpeed(chunkBytes,now-t);
-        if(now-lastLive>90){
-          const overall=sampleSpeed(totalBytes,now-started);
-          const phaseProgress=12+(i/(sizes.length))*62;
-          setGauge(Math.max(live,overall),phaseProgress,'Download • live');
-          els.downloadMbps.textContent=formatMbps(Math.max(live,overall))+' Mbps';
-          els.downloadMBps.textContent=formatMBps(Math.max(live,overall)/8)+' MBps';
-          lastLive=now;
+
+    els.downloadMbps.textContent='— Mbps';
+    els.downloadMBps.textContent='— MBps';
+    els.uploadMbps.textContent='— Mbps';
+    els.uploadMBps.textContent='— MBps';
+
+    els.latency.textContent='— ms';
+    els.network.textContent='Mencari...';
+    els.result.textContent='Siap tes';
+
+    phaseClass(els.downloadCard,'');
+    phaseClass(els.uploadCard,'');
+
+    els.start.disabled=!els.consent.checked;
+    els.start.textContent='Mulai Tes';
+  }
+
+  async function discoverServer(signal){
+    const url=new URL(LOCATE);
+    url.searchParams.set('client_name','NetSpeed Test');
+    url.searchParams.set('client_version','1.0');
+    url.searchParams.set('client_library_name','NetSpeed Test');
+    url.searchParams.set('client_library_version','1.0');
+
+    const response=await fetch(url,{
+      cache:'no-store',
+      signal,
+      headers:{Accept:'application/json'}
+    });
+
+    if(response.status===204) throw new Error('M-Lab sedang kehabisan kapasitas di area terdekat.');
+    if(!response.ok) throw new Error('Server pencari M-Lab tidak tersedia.');
+
+    const data=await response.json();
+
+    if(!data.results || !data.results.length){
+      throw new Error('Tidak ada server M-Lab yang tersedia.');
+    }
+
+    return data.results;
+  }
+
+  function getWsUrls(server){
+    const urls=server.urls||{};
+    return {
+      download:urls['wss:///ndt/v7/download']||'',
+      upload:urls['wss:///ndt/v7/upload']||''
+    };
+  }
+
+  function serverLabel(server){
+    const location=server.location||{};
+    const city=location.city||'';
+    const country=location.country||'';
+    return [city,country].filter(Boolean).join(', ') || server.machine || 'M-Lab';
+  }
+
+  function measureDownload(url, signal, onUpdate){
+    return new Promise((resolve,reject)=>{
+      let socket;
+      let start=0;
+      let lastUpdate=0;
+      let total=0;
+      let opened=false;
+      let settled=false;
+
+      const timeout=setTimeout(
+        ()=>finish(false,new Error('Download timeout')),
+        12000
+      );
+
+      const finish=(ok,err)=>{
+        if(settled) return;
+
+        settled=true;
+        clearTimeout(timeout);
+
+        if(socket){
+          try{
+            socket.onclose=null;
+            socket.onerror=null;
+            socket.onmessage=null;
+            socket.close();
+          }catch{}
         }
+
+        state.currentSocket=null;
+
+        if(err){
+          reject(err);
+        }else{
+          const elapsed=performance.now()-start;
+          resolve({
+            speed:ok?sampleSpeed(total,elapsed):0,
+            bytes:total,
+            elapsed
+          });
+        }
+      };
+
+      const sampleSpeed=(bytes,elapsed)=>{
+        return elapsed>0?(bytes*8/elapsed/1000):0;
+      };
+
+      try{
+        socket=new WebSocket(url,WS_PROTOCOL);
+      }catch(err){
+        reject(err);
+        return;
       }
-      const elapsed=performance.now()-t;
-      const speed=sampleSpeed(chunkBytes,elapsed);
-      if(elapsed>140) state.downSamples.push(speed);
-      const p=12+((i+1)/sizes.length)*62;
-      setGauge(speed,p,'Download • analisis');
-      els.downloadMbps.textContent=formatMbps(speed)+' Mbps';
-      els.downloadMBps.textContent=formatMBps(speed/8)+' MBps';
-    }
-    const stable=state.downSamples.slice(-Math.max(3,Math.ceil(state.downSamples.length*.6)));
-    stable.sort((a,b)=>a-b);
-    const median=stable[Math.floor(stable.length/2)] || sampleSpeed(totalBytes,performance.now()-started);
-    state.download=median;
-    els.downloadMbps.textContent=formatMbps(median)+' Mbps';
-    els.downloadMBps.textContent=formatMBps(median/8)+' MBps';
-    els.downloadState.textContent='Selesai';
-    markPhase(els.downloadCard,'done');
+
+      state.currentSocket=socket;
+      socket.binaryType='arraybuffer';
+
+      socket.onopen=()=>{
+        opened=true;
+        start=performance.now();
+        lastUpdate=start;
+        onUpdate({progress:8,speed:0,elapsed:0});
+      };
+
+      socket.onmessage=(event)=>{
+        if(typeof event.data==='string') return;
+
+        const bytes=event.data instanceof ArrayBuffer
+          ? event.data.byteLength
+          : (event.data?.size||0);
+
+        total+=bytes;
+
+        const now=performance.now();
+
+        if(now-lastUpdate>=180){
+          const elapsed=now-start;
+          const speed=sampleSpeed(total,elapsed);
+          const progress=Math.min(68,8+(elapsed/TEST_DURATION)*58);
+
+          onUpdate({progress,speed,elapsed});
+          lastUpdate=now;
+        }
+      };
+
+      socket.onerror=()=>{
+        finish(false,new Error('Koneksi download gagal.'));
+      };
+
+      socket.onclose=()=>{
+        if(!opened){
+          finish(false,new Error('Server download tidak dapat dibuka.'));
+          return;
+        }
+
+        finish(true);
+      };
+
+      signal.addEventListener(
+        'abort',
+        ()=>finish(false,new DOMException('Aborted','AbortError')),
+        {once:true}
+      );
+    });
   }
-  async function runUpload(signal){
-    state.phase='upload';
-    state.phaseStartedAt=performance.now();
-    markPhase(els.downloadCard,'done');
-    markPhase(els.uploadCard,'active');
-    els.downloadState.textContent='Selesai';
-    els.uploadState.textContent='Mengukur';
-    els.progressLabel.textContent='Mengukur upload';
-    setStatus('Upload aktif','active');
-    let totalBytes=0;
-    const started=performance.now();
-    const totalChunks=5;
-    for(let i=0;i<totalChunks;i++){
-      const size=[250000,500000,1000000,2000000,3000000][i];
-      const bytes=new Uint8Array(size);
-      crypto.getRandomValues(bytes.subarray(0,Math.min(size,65536)));
-      const t=performance.now();
-      const res=await fetch(UP+'?cachebust='+Date.now()+'-'+i,{method:'POST',body:bytes,cache:'no-store',signal,mode:'cors'});
-      if(!res.ok) throw new Error('Upload request failed');
-      await res.arrayBuffer().catch(()=>{});
-      const elapsed=performance.now()-t;
-      totalBytes+=size;
-      const speed=sampleSpeed(size,elapsed);
-      if(elapsed>120) state.upSamples.push(speed);
-      const p=78+((i+1)/totalChunks)*18;
-      setGauge(speed,p,'Upload • analisis');
-      els.uploadMbps.textContent=formatMbps(speed)+' Mbps';
-      els.uploadMBps.textContent=formatMBps(speed/8)+' MBps';
-      await new Promise(r=>setTimeout(r,20));
-    }
-    const stable=state.upSamples.slice(-Math.max(3,Math.ceil(state.upSamples.length*.6)));
-    stable.sort((a,b)=>a-b);
-    const median=stable[Math.floor(stable.length/2)] || sampleSpeed(totalBytes,performance.now()-started);
-    state.upload=median;
-    els.uploadMbps.textContent=formatMbps(median)+' Mbps';
-    els.uploadMBps.textContent=formatMBps(median/8)+' MBps';
-    els.uploadState.textContent='Selesai';
-    markPhase(els.uploadCard,'done');
+
+  function measureUpload(url, signal, onUpdate){
+    return new Promise((resolve,reject)=>{
+      let socket;
+      let start=0;
+      let lastUpdate=0;
+      let total=0;
+      let lastSpeed=0;
+      let data=new Uint8Array(8192);
+      let settled=false;
+
+      const timeout=setTimeout(
+        ()=>finish(false,new Error('Upload timeout')),
+        12500
+      );
+
+      const finish=(ok,err)=>{
+        if(settled) return;
+
+        settled=true;
+        clearTimeout(timeout);
+
+        if(socket){
+          try{
+            socket.onclose=null;
+            socket.onerror=null;
+            socket.onmessage=null;
+            socket.close();
+          }catch{}
+        }
+
+        state.currentSocket=null;
+
+        if(err){
+          reject(err);
+        }else{
+          resolve({
+            speed:lastSpeed,
+            bytes:Math.max(0,total-(socket?.bufferedAmount||0)),
+            elapsed:performance.now()-start
+          });
+        }
+      };
+
+      try{
+        socket=new WebSocket(url,WS_PROTOCOL);
+      }catch(err){
+        reject(err);
+        return;
+      }
+
+      state.currentSocket=socket;
+
+      socket.onopen=()=>{
+        start=performance.now();
+        lastUpdate=start;
+        onUpdate({progress:70,speed:0,elapsed:0});
+        uploadLoop();
+      };
+
+      socket.onmessage=(event)=>{
+        if(typeof event.data!=='string') return;
+      };
+
+      socket.onerror=()=>{
+        finish(false,new Error('Koneksi upload gagal.'));
+      };
+
+      socket.onclose=()=>{
+        if(!settled){
+          if(start){
+            finish(true);
+          }else{
+            finish(false,new Error('Server upload tidak dapat dibuka.'));
+          }
+        }
+      };
+
+      function uploadLoop(){
+        if(settled || !socket || socket.readyState!==WebSocket.OPEN) return;
+
+        const now=performance.now();
+        const elapsed=now-start;
+
+        if(elapsed>=TEST_DURATION){
+          lastSpeed=measureSent(total,socket.bufferedAmount,elapsed);
+          onUpdate({progress:94,speed:lastSpeed,elapsed});
+          socket.close();
+          return;
+        }
+
+        const nextSizeIncrement=data.length>=8388608
+          ? Infinity
+          : 16*data.length;
+
+        if((total-socket.bufferedAmount)>=nextSizeIncrement){
+          data=new Uint8Array(Math.min(data.length*2,8388608));
+        }
+
+        const desiredBuffer=7*data.length;
+
+        if(socket.bufferedAmount<desiredBuffer){
+          socket.send(data);
+          total+=data.length;
+        }
+
+        if(now-lastUpdate>=180){
+          lastSpeed=measureSent(total,socket.bufferedAmount,elapsed);
+          const progress=Math.min(94,70+(elapsed/TEST_DURATION)*24);
+          onUpdate({progress,speed:lastSpeed,elapsed});
+          lastUpdate=now;
+        }
+
+        setTimeout(uploadLoop,0);
+      }
+
+      function measureSent(all,buff,elapsed){
+        const delivered=Math.max(0,all-buff);
+        return elapsed>0?(delivered*8/elapsed/1000):0;
+      }
+
+      signal.addEventListener(
+        'abort',
+        ()=>finish(false,new DOMException('Aborted','AbortError')),
+        {once:true}
+      );
+    });
   }
-  async function startTest(){
-    if(state.running) return;
+
+  async function runTest(){
+    if(state.running || !els.consent.checked) return;
+
     state.running=true;
     state.aborter=new AbortController();
-    els.start.disabled=true; els.start.textContent='Tes Berjalan…';
-    els.result.textContent='Mengukur';
-    setStatus('Menghubungkan','active');
+
+    const signal=state.aborter.signal;
+
+    els.start.disabled=true;
+    els.start.textContent='Tes Berjalan…';
+    els.result.textContent='Menyiapkan';
+
+    setStatus('Mencari server','active');
+    els.network.textContent='Mencari...';
+
     try{
-      const latency=await latencyTest(state.aborter.signal);
-      els.latency.textContent=Math.round(latency)+' ms';
-      els.network.textContent=latency<30?'Sangat cepat':latency<70?'Baik':latency<120?'Cukup':'Tinggi';
-      setGauge(0,8,'Menyiapkan tes');
-      await runDownload(state.aborter.signal);
-      await runUpload(state.aborter.signal);
-      setGauge(Math.max(state.download,state.upload),100,'Tes selesai');
+      const servers=await discoverServer(signal);
+
+      let chosen=null;
+      let wsUrls=null;
+
+      for(const candidate of servers){
+        const urls=getWsUrls(candidate);
+
+        if(urls.download && urls.upload){
+          chosen=candidate;
+          wsUrls=urls;
+          break;
+        }
+      }
+
+      if(!chosen){
+        throw new Error('Endpoint pengukuran tidak ditemukan.');
+      }
+
+      state.downloadServer=chosen;
+
+      els.network.textContent=serverLabel(chosen);
+      setStatus('Server siap','active');
+      els.result.textContent='Terhubung';
+
+      phaseClass(els.downloadCard,'active');
+      els.downloadState.textContent='Mengukur';
+
+      const connectStarted=performance.now();
+      els.uploadState.textContent='Menunggu';
+      els.progressLabel.textContent='Mengukur download';
+      setStatus('Download aktif','active');
+
+      let connectShown=false;
+
+      const down=await measureDownload(
+        wsUrls.download,
+        signal,
+        (m)=>{
+          if(!connectShown){
+            els.latency.textContent=Math.max(
+              1,
+              Math.round(performance.now()-connectStarted)
+            )+' ms';
+
+            connectShown=true;
+          }
+
+          setGauge(m.speed,m.progress,'Download • live');
+
+          els.downloadMbps.textContent=formatMbps(m.speed)+' Mbps';
+          els.downloadMBps.textContent=formatMBps(m.speed/8)+' MBps';
+          els.result.textContent='Mengukur';
+        }
+      );
+
+      state.download=down.speed;
+
+      els.downloadMbps.textContent=formatMbps(down.speed)+' Mbps';
+      els.downloadMBps.textContent=formatMBps(down.speed/8)+' MBps';
+      els.downloadState.textContent='Selesai';
+      phaseClass(els.downloadCard,'done');
+
+      phaseClass(els.uploadCard,'active');
+      els.uploadState.textContent='Mengukur';
+      els.progressLabel.textContent='Mengukur upload';
+      setStatus('Upload aktif','active');
+
+      const up=await measureUpload(
+        wsUrls.upload,
+        signal,
+        (m)=>{
+          setGauge(m.speed,m.progress,'Upload • live');
+
+          els.uploadMbps.textContent=formatMbps(m.speed)+' Mbps';
+          els.uploadMBps.textContent=formatMBps(m.speed/8)+' MBps';
+        }
+      );
+
+      state.upload=up.speed;
+
+      els.uploadMbps.textContent=formatMbps(up.speed)+' Mbps';
+      els.uploadMBps.textContent=formatMBps(up.speed/8)+' MBps';
+      els.uploadState.textContent='Selesai';
+      phaseClass(els.uploadCard,'done');
+
+      setGauge(state.download,100,'Tes selesai');
+
       els.progressLabel.textContent='Tes selesai';
       els.result.textContent='Selesai';
+
       setStatus('Selesai','ok');
-      els.start.disabled=false; els.start.textContent='Tes Ulang';
-      state.running=false; state.aborter=null;
-    }catch(err){
-      if(err && err.name==='AbortError') return;
+
+      els.start.disabled=false;
+      els.start.textContent='Tes Ulang';
+
       state.running=false;
-      setStatus('Gagal','error');
-      els.result.textContent='Terjadi masalah';
-      els.progressLabel.textContent='Tidak dapat menyelesaikan tes';
-      els.liveMode.textContent='Gagal terhubung';
-      els.start.disabled=false; els.start.textContent='Coba Lagi';
       state.aborter=null;
+      state.currentSocket=null;
+    }catch(error){
+      if(error?.name==='AbortError') return;
+
+      state.running=false;
+      state.aborter=null;
+
+      if(state.currentSocket){
+        try{state.currentSocket.close();}catch{}
+        state.currentSocket=null;
+      }
+
+      const message=error?.message||'Tes gagal.';
+
+      setStatus('Gagal','error');
+      els.result.textContent='Gagal';
+      els.progressLabel.textContent=message;
+      els.liveMode.textContent='Tidak dapat menyelesaikan tes';
+      els.start.disabled=false;
+      els.start.textContent='Coba Lagi';
     }
   }
 
-  els.start.addEventListener('click',startTest,{passive:true});
+  els.consent.addEventListener(
+    'change',
+    ()=>{
+      if(!state.running){
+        els.start.disabled=!els.consent.checked;
+      }
+    },
+    {passive:true}
+  );
+
+  els.start.addEventListener('click',runTest,{passive:true});
   els.reset.addEventListener('click',resetUI,{passive:true});
-  if(reducedMotion){ document.documentElement.classList.add('reduced-motion'); }
+
+  if(reducedMotion){
+    document.documentElement.classList.add('reduced-motion');
+  }
+
   resetUI();
 })();
 </script>
